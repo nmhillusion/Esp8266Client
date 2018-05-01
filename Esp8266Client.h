@@ -9,7 +9,7 @@ class Esp8266Client{
         void setup(int rx, int tx, int baud);
         bool connectAP(String ssid, String password);
         bool checkConnect();
-        String sendATCommand(String cmd, const int interval, boolean debug);
+        String sendATCommand(String cmd, int interval, boolean debug);
         String httpGet(String url);
         String httpPost(String url, int numVar, String* body);
 };

@@ -1,16 +1,14 @@
-#include "Esp8266Client.h"
+#include <Esp8266Client.h>
 #define DEBUG true
 
-//SoftwareSerial esp8266(8, 9); //  10-RX, 11-TX
 Esp8266Client client;
 
-char x;
 void setup() {
   Serial.begin(9600);
   Serial.println("TESTING");
   client.setup(8, 9, 9600);
 
-  while (!client.connectAP("BON FPT", "kemtuchon19k")) {
+  while (!client.connectAP("Nhatro MinhTam1", "minhtam2017")) {
     delay(4000);
     if (client.checkConnect()) break;
   }
@@ -21,6 +19,7 @@ void setup() {
     "password=123"
   };
   Serial.println("result test get: " + client.httpPost("nmhillusion.herokuapp.com/login", 2, body));
+
   Serial.println("FINISH TESTING");
 }
 

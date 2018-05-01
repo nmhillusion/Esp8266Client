@@ -7,21 +7,23 @@ SoftwareSerial* esp8266;
 Esp8266Client::Esp8266Client() {}
 
 void Esp8266Client::setup(int rx, int tx, int baud) {
+  Serial.println("setup for esp8266");
+  
   esp8266 = new SoftwareSerial(rx, tx);
   esp8266->begin(baud);
 
-  sendATCommand("AT+RST", 2000, true); // reset module
-  sendATCommand("AT+CWMODE=1", 1000, true); // Chọn chức năng client cho esp
-//  sendATCommand("AT+CIPMUX=0", 1000, true);
+  sendATCommand("AT+RST", 5000, true); // reset module
+  sendATCommand("AT+CWMODE=1", 1000, true); // become client: mode 1
+  sendATCommand("AT+CIPMUX=0", 1000, true);
 }
 
 String Esp8266Client::sendATCommand(String cmd,
-                                    const int interval, boolean debug) {
+                                    int interval, boolean debug) {
   String result = "";
 
   cmd += "\r\n";
   esp8266->print(cmd); // send the read character to the esp8266
-  //  Serial.println("command: " + cmd);
+  Serial.println("command: " + cmd);
   long int time = millis();
 
   while ((time + interval) > millis()) {
@@ -30,6 +32,10 @@ String Esp8266Client::sendATCommand(String cmd,
       // The esp has data so display its output to the serial window
       char c = esp8266->read(); // read the next character.
       result += c;
+    }
+    if(result.indexOf("busy") != -1){
+      result = "";
+      interval += interval;
     }
   }
 
@@ -75,9 +81,7 @@ String Esp8266Client::httpGet(String url) {
     content.trim();
     content = content.substring(0, content.indexOf("CLOSED"));
   }
-
-  sendATCommand("AT+CIPCLOSE=5", 1000, true);
-  
+  sendATCommand("AT", 2000, true);
   return content;
 }
 
@@ -92,6 +96,8 @@ String Esp8266Client::httpPost(String url, int numVar, String* body) {
       bodySend += "&";
     }
   }
+
+  delete body;
   
   int idxSplit = url.indexOf("/");
   String host = url.substring(0, idxSplit), path = url.substring(idxSplit),
@@ -108,7 +114,6 @@ String Esp8266Client::httpPost(String url, int numVar, String* body) {
 //    content = content.substring(0, content.indexOf("CLOSED"));
 //  }
 
-  sendATCommand("AT+CIPCLOSE=5", 1000, true);
-  
+  sendATCommand("AT", 2000, true);
   return content;
 }
